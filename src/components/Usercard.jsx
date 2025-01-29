@@ -1,7 +1,7 @@
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import {useDispatch} from "react-redux";
-import { removeFeed } from "../utils/feedSlice";
+import { removeFromFeed } from "../utils/feedSlice";
 
 const Usercard = ({ user }) => {
   
@@ -9,13 +9,17 @@ const Usercard = ({ user }) => {
 
   const dispatch = useDispatch();
 
-  const handleSendRequest = async(status, _id) =>{
+  const handleSendRequest = async(status, userid) =>{
     try{
-        const res = await axios.post(BASE_URL + "/request/send/"+status+"/"+_id,{},{withCredentials:true});
-        dispatch(removeFeed(_id));
+        const res = await axios.post(BASE_URL + "/request/send/"+ status +"/"+ userid,{},{withCredentials:true});
+        console.log("Removing user:",userid);
+        dispatch(removeFromFeed(userid));
     }
     catch(err){
-      console.error(err);
+       console.error(
+         "Error in request:",
+         err.response ? err.response.data : err.message
+       );
     } 
   }
 
@@ -44,7 +48,7 @@ const Usercard = ({ user }) => {
         <div className="card-actions flex justify-center space-x-4 mt-6">
           <button
             className="px-5 py-2 bg-blue-400 text-white font-bold rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 ease-in-out"
-            onClick={() => handleSendRequest("ignored", _id)}
+            onClick={() => handleSendRequest("ignore", _id)}
           >
             Ignore
           </button>
@@ -52,7 +56,7 @@ const Usercard = ({ user }) => {
             className="px-5 py-2 bg-pink-600   text-white font-bold rounded-full shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200 ease-in-out"
             onClick={() => handleSendRequest("interested", _id)}
           >
-            Send Request
+           Interested
           </button>
         </div>
       </div>
