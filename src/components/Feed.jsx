@@ -8,7 +8,7 @@ import Usercard from "./Usercard";
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const dispatch = useDispatch();
-  const [currentIndex, setCurrentIndex] = useState(0); // State to track the current card index
+  const [currentIndex, setCurrentIndex] = useState(0); 
 
   const getFeed = async () => {
     if (feed.length > 0) return;

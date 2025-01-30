@@ -25,7 +25,7 @@ const Login = () => {
         email,
         password,
       },{withCredentials:true});
-      console.log("Login successful:", response.data);
+      
       dispatch(addUser(response.data));
       navigate("/feed");
     } catch (err) {
