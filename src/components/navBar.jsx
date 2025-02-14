@@ -20,7 +20,7 @@ function Navbar() {
   };
 
   return (
-    <div className="flex items-center justify-between bg-sky-900 px-6 py-3 shadow-md">
+    <div className="flex items-center justify-between bg-gradient-to-l from-cyan-300 px-6 py-3 shadow-md">
       <Link to="/feed" className="text-2xl font-bold text-indigo-400">
         👨‍💻 CodeCircle
       </Link>
@@ -37,6 +37,9 @@ function Navbar() {
           </Link>
           <Link to="/requestreceived" className="btn">
             Requests
+          </Link>
+          <Link to="/help" className="btn">
+            Help
           </Link>
           <button className="btn bg-red-600 text-white" onClick={handleLogout}>
             Logout

@@ -8,6 +8,7 @@ import appStore from "./utils/appStore";
 import Feed from "./components/Feed";
 import Connections from "./components/connections";
 import Receivedrequests from "./components/receivedrequests";
+import Chatbot from "./components/chatbot";
 
 function App() {
   
@@ -23,6 +24,7 @@ function App() {
               <Route path="/profile" element={<Profile/>}/>
               <Route path="/connections" element={<Connections/>}/>
               <Route path="/requestreceived" element={<Receivedrequests/>}/>
+              <Route path="/help" element={<Chatbot/>}/>
             </Route>
         </Routes>
       </BrowserRouter>

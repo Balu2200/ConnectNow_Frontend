@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";
 
 const Connections = () => {
-  const connections = useSelector((store) => store.connection) || []; // Ensure connections is an array
+  const connections = useSelector((store) => store.connection) || []; 
   const dispatch = useDispatch();
 
   const fetchConnections = async () => {
@@ -30,8 +30,8 @@ const Connections = () => {
   }, []);
 
   return (
-    <div className="text-center my-10">
-      <h1 className="font-bold text-3xl text-pink-500 mb-6">Connections</h1>
+    <div className="text-center  bg-gradient-to-r from-slate-600 h-screen">
+      <h1 className="font-bold text-3xl text-indigo-500 mb-6 py-2">Connections</h1>
 
       {connections.length === 0 ? (
         <p className="text-gray-500 text-lg">No connections available.</p>
@@ -45,8 +45,8 @@ const Connections = () => {
 
               return (
                 <div
-                  key={_id || Math.random()} // Avoid crashing if _id is null
-                  className="bg-white p-5 w-[350px] shadow-lg rounded-2xl flex flex-col items-center transition-transform transform hover:scale-105"
+                  key={_id || Math.random()} 
+                  className="bg-slate-300 p-5 w-[350px] shadow-lg rounded-2xl flex flex-col items-center transition-transform transform hover:scale-105"
                 >
                   <img
                     className="w-28 h-28 rounded-full object-cover border-4 border-pink-400"

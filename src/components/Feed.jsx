@@ -44,12 +44,12 @@ const Feed = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-500 relative">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-gray-700 to-gray-900 transition-all duration-700 relative">
       {feed.length === 0 ? (
         <p className="text-gray-500 text-lg font-medium">Loading feed...</p>
       ) : feed.Data && feed.Data.length > 0 ? (
         <div className="relative flex items-center justify-center">
-          {/* Left Arrow (Close to the card) */}
+         
           <button
             className="absolute left-[-3.5rem] p-3 bg-gray-700 text-white rounded-full shadow-lg hover:bg-gray-800 transition"
             onClick={handlePrevious}
@@ -58,7 +58,7 @@ const Feed = () => {
             <FaArrowLeft size={24} />
           </button>
 
-          {/* Animated Usercard */}
+      
           <motion.div
             key={currentIndex}
             initial={{ opacity: 0, x: direction * 100 }}
@@ -70,7 +70,7 @@ const Feed = () => {
             <Usercard user={feed.Data[currentIndex]} />
           </motion.div>
 
-          {/* Right Arrow (Close to the card) */}
+      
           <button
             className="absolute right-[-3.5rem] p-3 bg-gray-700 text-white rounded-full shadow-lg hover:bg-gray-800 transition"
             onClick={handleNext}
