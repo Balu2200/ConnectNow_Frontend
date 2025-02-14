@@ -3,12 +3,15 @@ import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addFeed } from "../utils/feedSlice";
 import { useEffect, useState } from "react";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { motion } from "framer-motion";
 import Usercard from "./Usercard";
 
 const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const dispatch = useDispatch();
-  const [currentIndex, setCurrentIndex] = useState(0); 
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 = forward, -1 = backward
 
   const getFeed = async () => {
     if (feed.length > 0) return;
@@ -28,39 +31,53 @@ const Feed = () => {
 
   const handleNext = () => {
     if (feed.Data && currentIndex < feed.Data.length - 1) {
+      setDirection(1);
       setCurrentIndex((prevIndex) => prevIndex + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
+      setDirection(-1);
       setCurrentIndex((prevIndex) => prevIndex - 1);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-base-300">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-500 relative">
       {feed.length === 0 ? (
         <p className="text-gray-500 text-lg font-medium">Loading feed...</p>
       ) : feed.Data && feed.Data.length > 0 ? (
-        <div className="my-10">
-          <Usercard user={feed.Data[currentIndex]} />{" "}
-          <div className="flex justify-between mt-4">
-            <button
-              className="px-4 py-2 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition"
-              onClick={handlePrevious}
-              disabled={currentIndex === 0} 
-            >
-              Previous
-            </button>
-            <button
-              className="px-4 py-2 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 transition"
-              onClick={handleNext}
-              disabled={currentIndex === feed.Data.length - 1} 
-            >
-              Next
-            </button>
-          </div>
+        <div className="relative flex items-center justify-center">
+          {/* Left Arrow (Close to the card) */}
+          <button
+            className="absolute left-[-3.5rem] p-3 bg-gray-700 text-white rounded-full shadow-lg hover:bg-gray-800 transition"
+            onClick={handlePrevious}
+            disabled={currentIndex === 0}
+          >
+            <FaArrowLeft size={24} />
+          </button>
+
+          {/* Animated Usercard */}
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0, x: direction * 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -direction * 100 }}
+            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+            className="relative flex items-center justify-center"
+          >
+            <Usercard user={feed.Data[currentIndex]} />
+          </motion.div>
+
+          {/* Right Arrow (Close to the card) */}
+          <button
+            className="absolute right-[-3.5rem] p-3 bg-gray-700 text-white rounded-full shadow-lg hover:bg-gray-800 transition"
+            onClick={handleNext}
+            disabled={currentIndex === feed.Data.length - 1}
+          >
+            <FaArrowRight size={24} />
+          </button>
         </div>
       ) : (
         <p className="text-gray-500 text-lg font-medium">

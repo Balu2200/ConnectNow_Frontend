@@ -5,7 +5,7 @@ import { BASE_URL } from "../utils/constants";
 import { addUser } from "../utils/userSlice";
 import Usercard from "./Usercard";
 
-const Editprofile = () => {
+const EditProfile = () => {
   const user = useSelector((store) => store.user);
 
   const [firstName, setFirstName] = useState(user.firstName || "");
@@ -45,7 +45,7 @@ const Editprofile = () => {
         { withCredentials: true }
       );
       dispatch(addUser(res.data?.data));
-      setSuccess(true); 
+      setSuccess(true);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -54,102 +54,99 @@ const Editprofile = () => {
   };
 
   return (
-    <div className="flex justify-center my-10">
+    <div className="flex justify-center items-center min-h-screen p-6">
       {viewProfile ? (
-        <div className="flex flex-col items-center justify-center text-center">
+        <div className="flex flex-col items-center text-center">
           <Usercard
             user={{ firstName, lastName, photoUrl, age, about, skills }}
           />
           <button
-            className="btn btn-secondary mt-4"
+            className="mt-4 px-5 py-2.5 rounded-md bg-gray-800 hover:bg-gray-700 text-white font-medium transition"
             onClick={() => setViewProfile(false)}
           >
             Back to Edit
           </button>
         </div>
       ) : !success ? (
-        <div className="card bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-xl rounded-lg w-96">
-          <div className="card-body">
-            <h2 className="card-title text-center font-bold text-2xl">
-              Edit Profile
-            </h2>
-            <p className="text-sm text-center mb-4">
-              Update your personal information below.
-            </p>
-            <div className="space-y-4">
-              <input
-                type="text"
-                className="input input-bordered w-full rounded-lg p-3 bg-gray-50 text-black"
-                placeholder="Enter your first name"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
-              <input
-                type="text"
-                className="input input-bordered w-full rounded-lg p-3 bg-gray-50 text-black"
-                placeholder="Enter your last name"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-              <input
-                type="number"
-                className="input input-bordered w-full rounded-lg p-3 bg-gray-50 text-black"
-                placeholder="Enter your age"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-              />
-              <input
-                type="text"
-                className="input input-bordered w-full rounded-lg p-3 bg-gray-50 text-black"
-                placeholder="Enter your photo URL"
-                value={photoUrl}
-                onChange={(e) => setPhotoUrl(e.target.value)}
-              />
-              <input
-                type="text"
-                className="input input-bordered w-full rounded-lg p-3 bg-gray-50 text-black"
-                placeholder="Tell us about yourself"
-                value={about}
-                onChange={(e) => setAbout(e.target.value)}
-              />
-              <input
-                type="text"
-                className="input input-bordered w-full rounded-lg p-3  bg-gray-50 text-black"
-                placeholder="Enter your skills (comma-separated)"
-                value={skills}
-                onChange={(e) => setSkills(e.target.value)}
-              />
-            </div>
-            {error && (
-              <p className="text-red-500 text-sm mt-2 text-center font-semibold">
-                {error}
-              </p>
-            )}
-            <div className="card-actions justify-between mt-6">
-              <button
-                onClick={() => setViewProfile(true)}
-                className="btn btn-secondary rounded-lg text-white font-semibold"
-              >
-                View Profile
-              </button>
-              <button
-                onClick={saveProfile}
-                className={`btn btn-primary w-full rounded-lg text-white font-semibold ${
-                  loading ? "loading" : ""
-                }`}
-                disabled={loading}
-              >
-                {loading ? "Saving..." : "Submit"}
-              </button>
-            </div>
+        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg rounded-lg p-6 w-full max-w-lg">
+          <h2 className="text-2xl font-bold text-center mb-4">Edit Profile</h2>
+
+          <div className="space-y-3">
+            <input
+              type="text"
+              className="w-full p-3 rounded-md bg-gray-100 text-black focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+
+            <input
+              type="text"
+              className="w-full p-3 rounded-md bg-gray-100 text-black focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+
+            <input
+              type="number"
+              className="w-full p-3 rounded-md bg-gray-100 text-black focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Age"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+            />
+
+            <input
+              type="text"
+              className="w-full p-3 rounded-md bg-gray-100 text-black focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Photo URL"
+              value={photoUrl}
+              onChange={(e) => setPhotoUrl(e.target.value)}
+            />
+
+            <textarea
+              className="w-full p-3 rounded-md bg-gray-100 text-black focus:ring-2 focus:ring-blue-500 outline-none resize-none h-24"
+              placeholder="About"
+              value={about}
+              onChange={(e) => setAbout(e.target.value)}
+            />
+
+            <input
+              type="text"
+              className="w-full p-3 rounded-md bg-gray-100 text-black focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="Skills (comma-separated)"
+              value={skills}
+              onChange={(e) => setSkills(e.target.value)}
+            />
+          </div>
+
+          {error && (
+            <p className="text-red-400 text-sm mt-3 text-center">{error}</p>
+          )}
+
+          <div className="flex justify-between items-center mt-5">
+            <button
+              onClick={() => setViewProfile(true)}
+              className="px-5 py-2.5 rounded-md bg-gray-800 hover:bg-gray-700 text-white font-medium transition"
+            >
+              View Profile
+            </button>
+            <button
+              onClick={saveProfile}
+              className={`px-5 py-2.5 rounded-md text-white font-medium transition ${
+                loading
+                  ? "bg-gray-500 cursor-not-allowed"
+                  : "bg-red-500 hover:bg-blue-600"
+              }`}
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Submit"}
+            </button>
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center text-center">
-          <h2 className="text-2xl font-bold text-green-600">
-            Profile Updated Successfully!
-          </h2>
-          <p className="text-gray-600 mt-2">Your changes have been saved.</p>
+        <div className="flex flex-col items-center text-center">
+          <h2 className="text-xl font-bold text-green-500">Profile Updated!</h2>
           <Usercard
             user={{ firstName, lastName, photoUrl, age, about, skills }}
           />
@@ -159,4 +156,4 @@ const Editprofile = () => {
   );
 };
 
-export default Editprofile;
+export default EditProfile;

@@ -5,8 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/connectionSlice";
 
 const Connections = () => {
-  const connections = useSelector((store) => store.connection);
-
+  const connections = useSelector((store) => store.connection) || []; // Ensure connections is an array
   const dispatch = useDispatch();
 
   const fetchConnections = async () => {
@@ -14,9 +13,15 @@ const Connections = () => {
       const res = await axios.get(BASE_URL + "/user/connections", {
         withCredentials: true,
       });
-      dispatch(addConnections(res.data.Data));
+
+   
+      if (res.data && res.data.Data) {
+        dispatch(addConnections(res.data.Data));
+      } else {
+        console.warn("No connections found");
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching connections:", err);
     }
   };
 
@@ -26,38 +31,50 @@ const Connections = () => {
 
   return (
     <div className="text-center my-10">
-      <h1 className="font-bold text-3xl text-pink-400">Connections</h1>
-      {connections.map((con) => {
-        const { _id, firstName, lastName, photoUrl, age, about } = con;
+      <h1 className="font-bold text-3xl text-pink-500 mb-6">Connections</h1>
 
-        return (
-          <div
-            key={_id}
-            className="mt-4 m-10 h-52 p-5 w-1/2 bg-slate-300 rounded-2xl flex shadow-lg hover:shadow-xl transition-shadow duration-300 mx-auto"
-          >
-            <img
-              className="w-40 h-40 -mt-2 rounded-full object-cover border-4 border-pink-400"
-              alt="photo"
-              src={
-                photoUrl ||
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpCKq1XnPYYDaUIlwlsvmLPZ-9-rdK28RToA&s"
-              }
-            />
-            <div className="ml-6 flex flex-col justify-center">
-              <h2 className="text-gray-800 text-2xl font-semibold">
-                {firstName + " " + lastName}
-              </h2>
-              <h3 className="text-black mt-2">Age: {age}</h3>
-              <p className="text-black mt-1 max-w-xs truncate">
-                Profession: {about || "N/A"}
-              </p>
-            </div>
-            <div className="flex items-center ml-auto">
-              <button className="btn btn-primary">🔤Message</button>
-            </div>
-          </div>
-        );
-      })}
+      {connections.length === 0 ? (
+        <p className="text-gray-500 text-lg">No connections available.</p>
+      ) : (
+        <div className="flex flex-wrap justify-center gap-6">
+          {connections
+            .filter((con) => con) 
+            .map((con) => {
+              const { _id, firstName, lastName, photoUrl, age, about } =
+                con || {};
+
+              return (
+                <div
+                  key={_id || Math.random()} // Avoid crashing if _id is null
+                  className="bg-white p-5 w-[350px] shadow-lg rounded-2xl flex flex-col items-center transition-transform transform hover:scale-105"
+                >
+                  <img
+                    className="w-28 h-28 rounded-full object-cover border-4 border-pink-400"
+                    alt="User"
+                    src={
+                      photoUrl ||
+                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpCKq1XnPYYDaUIlwlsvmLPZ-9-rdK28RToA&s"
+                    }
+                  />
+                  <h2 className="text-gray-800 text-xl font-semibold mt-4">
+                    {firstName
+                      ? `${firstName} ${lastName || ""}`
+                      : "Unknown User"}
+                  </h2>
+                  <h3 className="text-gray-600 mt-1 text-sm">
+                    Age: {age || "N/A"}
+                  </h3>
+                  <p className="text-gray-600 mt-2 text-sm text-center px-4">
+                    {about ? `Profession: ${about}` : "No details available"}
+                  </p>
+                  <button className="mt-4 px-5 py-2 bg-pink-500 text-white font-medium rounded-full shadow-md hover:bg-pink-600 transition">
+                    Message 💬
+                  </button>
+                </div>
+              );
+            })}
+        </div>
+      )}
     </div>
   );
 };
