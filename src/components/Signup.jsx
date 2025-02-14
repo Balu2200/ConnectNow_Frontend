@@ -27,62 +27,68 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex justify-center items-center my-10">
-      <div className="card bg-gradient-to-br bg-black text-white shadow-xl rounded-lg w-96">
-        <div className="card-body">
-          <h2 className="card-title text-red-500 text-center mx-auto font-bold text-2xl">
-            Signup
-          </h2>
-          <p className="text-sm text-center mb-4">
-            Create a new account by filling the form below.
-          </p>
-          <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 text-white">
+      <div className="w-full max-w-md p-8 bg-gray-800 bg-opacity-90 rounded-xl shadow-xl backdrop-blur-lg">
+        <h2 className="text-3xl font-bold text-center text-blue-400 mb-6">
+          Signup
+        </h2>
+        <p className="text-sm text-center text-gray-400 mb-4">
+          Create a new account by filling the form below.
+        </p>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
             <input
               type="text"
               name="firstName"
-              className="input input-bordered w-full rounded-lg p-3 bg-gray-50 text-black"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"
               placeholder="Enter your first name"
               required
             />
+          </div>
+          <div>
             <input
               type="text"
               name="lastName"
-              className="input input-bordered w-full rounded-lg p-3 bg-gray-50 text-black"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"
               placeholder="Enter your last name"
               required
             />
+          </div>
+          <div>
             <input
               type="email"
               name="email"
-              className="input input-bordered w-full rounded-lg p-3 bg-gray-50 text-black"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"
               placeholder="Enter your email"
               required
             />
+          </div>
+          <div>
             <input
               type="password"
               name="password"
-              className="input input-bordered w-full rounded-lg p-3 bg-gray-50 text-black"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 outline-none"
               placeholder="Enter your password"
               required
             />
-            <button
-              type="submit"
-              className="btn btn-primary w-full rounded-lg text-white font-semibold mt-4"
-            >
-              Submit
-            </button>
-          </form>
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-400 mb-2">
-              Already have an account?
-            </p>
-            <Link
-              to="/login"
-              className="btn btn-secondary w-full rounded-lg text-white font-semibold"
-            >
-              Go to Login
-            </Link>
           </div>
+          <button
+            type="submit"
+            className="w-full p-3 rounded-lg bg-blue-500 hover:bg-blue-400 transition text-white font-semibold shadow-md"
+          >
+            Signup
+          </button>
+        </form>
+
+        <div className="text-center mt-6">
+          <p className="text-sm text-gray-400 mb-2">Already have an account?</p>
+          <Link
+            to="/login"
+            className="w-full block p-3 rounded-lg bg-gray-700 hover:bg-gray-600 transition text-white font-semibold shadow-md"
+          >
+            Go to Login
+          </Link>
         </div>
       </div>
     </div>
