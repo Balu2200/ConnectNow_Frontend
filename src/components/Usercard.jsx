@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useState } from "react";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeFromFeed } from "../utils/feedSlice";
@@ -6,6 +7,7 @@ import { removeFromFeed } from "../utils/feedSlice";
 const Usercard = ({ user }) => {
   const { _id, photoUrl, firstName, lastName, about, skills } = user;
   const dispatch = useDispatch();
+  const [responseStatus, setResponseStatus] = useState(null); 
 
   const handleSendRequest = async (status, userId) => {
     try {
@@ -14,7 +16,11 @@ const Usercard = ({ user }) => {
         {},
         { withCredentials: true }
       );
-      console.log("Removing user:", userId);
+
+      // Set response message based on status
+      setResponseStatus(status === "interested" ? "Interested" : "Ignored");
+
+      // Remove the user from feed
       dispatch(removeFromFeed(userId));
     } catch (err) {
       console.error(
@@ -51,18 +57,43 @@ const Usercard = ({ user }) => {
         )}
         <p className="text-gray-300 mt-3 text-sm">{about}</p>
 
+        {responseStatus && (
+          <p
+            className={`mt-4 font-semibold ${
+              responseStatus === "Interested"
+                ? "text-green-400"
+                : "text-red-400"
+            }`}
+          >
+            {responseStatus === "Interested"
+              ? "Connection request sent!"
+              : "User ignored."}
+          </p>
+        )}
+
         <div className="flex justify-center space-x-4 mt-6">
           <button
-            className="px-4 py-2 bg-gray-700 text-white font-medium rounded-md shadow-md hover:bg-gray-600 transition-all duration-200"
+            className={`px-4 py-2 font-medium rounded-md shadow-md transition-all duration-200 ${
+              responseStatus === "Ignored"
+                ? "bg-gray-500 text-gray-300 cursor-not-allowed"
+                : "bg-gray-700 text-white hover:bg-gray-600"
+            }`}
             onClick={() => handleSendRequest("ignore", _id)}
+            disabled={responseStatus !== null}
           >
-            Ignore
+            {responseStatus === "Ignored" ? "Ignored" : "Ignore"}
           </button>
+
           <button
-            className="px-4 py-2 bg-blue-600 text-white font-medium rounded-md shadow-md hover:bg-blue-500 transition-all duration-200"
+            className={`px-4 py-2 font-medium rounded-md shadow-md transition-all duration-200 ${
+              responseStatus === "Interested"
+                ? "bg-green-500 text-white cursor-not-allowed"
+                : "bg-blue-600 text-white hover:bg-blue-500"
+            }`}
             onClick={() => handleSendRequest("interested", _id)}
+            disabled={responseStatus !== null}
           >
-            Interested
+            {responseStatus === "Interested" ? "Request Sent" : "Interested"}
           </button>
         </div>
       </div>
