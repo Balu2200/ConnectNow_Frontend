@@ -9,6 +9,7 @@ import Feed from "./components/Feed";
 import Connections from "./components/connections";
 import Receivedrequests from "./components/receivedrequests";
 import Chatbot from "./components/chatbot";
+import Chatting from "./components/chatting";
 
 function App() {
   
@@ -25,6 +26,7 @@ function App() {
               <Route path="/connections" element={<Connections/>}/>
               <Route path="/requestreceived" element={<Receivedrequests/>}/>
               <Route path="/help" element={<Chatbot/>}/>
+              <Route path="/chat/:targetUserId" element={<Chatting/>}/>
             </Route>
         </Routes>
       </BrowserRouter>
