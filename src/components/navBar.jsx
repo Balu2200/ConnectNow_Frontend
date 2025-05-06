@@ -22,8 +22,7 @@ function Navbar() {
   return (
     <div className="flex items-center justify-between bg-gradient-to-l from-cyan-300 px-6 py-3 shadow-md">
       <Link to="/feed" className="text-2xl font-bold text-indigo-400">
-        👨‍💻 CodeCircle
-      </Link>
+        👨‍💻 B     </Link>
       {user && (
         <div className="flex items-center space-x-4">
           <span className="text-blue-100 font-semibold">
