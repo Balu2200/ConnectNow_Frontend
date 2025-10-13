@@ -18,7 +18,7 @@ const Chatbot = () => {
     try {
       const response = await axios.post(`${BASE_URL}/chatbot/message`, {
         question: input,
-      });
+      }, {withCredentials: true});
       setMessages((prevMessages) => [
         ...prevMessages,
         { sender: "bot", text: response.data.response },
