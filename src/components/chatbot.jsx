@@ -16,14 +16,18 @@ const Chatbot = () => {
     setMessages([...messages, userMessage]);
 
     try {
-      const response = await axios.post(`${BASE_URL}/chatbot/message`, {
-        question: input,
-      }, {withCredentials: true});
+      const response = await axios.post(
+        `${BASE_URL}/chatbot/message`,
+        {
+          question: input,
+        },
+        { withCredentials: true }
+      );
       setMessages((prevMessages) => [
         ...prevMessages,
         { sender: "bot", text: response.data.response },
       ]);
-    } catch (error) {
+    } catch {
       setMessages((prevMessages) => [
         ...prevMessages,
         { sender: "bot", text: "Error connecting to chatbot." },
@@ -37,44 +41,83 @@ const Chatbot = () => {
   }, [messages]);
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gradient-to-r from-gray-900 to-black">
-      <div className="bg-gray-800 shadow-2xl rounded-2xl w-96 h-[500px] flex flex-col overflow-hidden">
-        <div className="p-4 bg-gradient-to-r from-blue-700 to-blue-900 text-white font-bold text-center text-lg rounded-t-2xl">
-          Chatbot
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+      <div className="w-full max-w-lg bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        {/* Chatbot Header */}
+        <div className="bg-primary px-6 py-4 flex items-center space-x-3">
+          <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+            <svg
+              className="w-4 h-4 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+              ></path>
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-white">AI Assistant</h2>
         </div>
 
         {/* Chat messages */}
-        <div className="p-3 flex-1 overflow-y-auto space-y-3 scrollbar-thin scrollbar-thumb-gray-600">
+        <div className="h-80 p-6 overflow-y-auto bg-slate-50">
           {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={`p-3 rounded-2xl max-w-[80%] break-words shadow-md ${
-                msg.sender === "user"
-                  ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white ml-auto"
-                  : "bg-gray-700 text-white mr-auto"
-              }`}
-            >
-              {msg.text}
+            <div key={index} className="mb-4">
+              {msg.sender === "bot" ? (
+                <div className="flex items-start space-x-3">
+                  <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded-2xl rounded-tl-sm px-4 py-3 max-w-xs">
+                    <p className="text-sm text-slate-700">{msg.text}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-end mb-4">
+                  <div className="bg-primary text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-xs">
+                    <p className="text-sm">{msg.text}</p>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
           <div ref={messagesEndRef} />
         </div>
 
         {/* Input field */}
-        <div className="p-3 border-t border-gray-700 flex items-center bg-gray-900 rounded-b-2xl">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            className="w-full border border-gray-600 p-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 bg-gray-800 text-white"
-          />
-          <button
-            onClick={sendMessage}
-            className="ml-2 bg-gradient-to-r from-blue-500 to-blue-700 text-white p-2 rounded-lg hover:from-blue-600 hover:to-blue-800 transition"
-          >
-            <IoSend size={20} />
-          </button>
+        <div className="border-t border-slate-200 p-4 bg-white">
+          <div className="flex items-center space-x-3">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+              placeholder="Type your message..."
+              className="flex-1 px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-slate-400"
+            />
+            <button
+              onClick={sendMessage}
+              className="bg-primary hover:bg-blue-700 text-white p-3 rounded-xl transition-colors"
+            >
+              <IoSend size={20} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

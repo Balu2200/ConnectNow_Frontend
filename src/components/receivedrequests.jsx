@@ -21,75 +21,153 @@ const ReceivedRequests = () => {
     }
   };
 
-  const fetchRequests = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/user/request/received`, {
-        withCredentials: true,
-      });
-      dispatch(addRequest(res.data.Data));
-    } catch (err) {
-      console.error("Error fetching requests:", err);
-    }
-  };
-
   useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/user/request/received`, {
+          withCredentials: true,
+        });
+        dispatch(addRequest(res.data.Data));
+      } catch (err) {
+        console.error("Error fetching requests:", err);
+      }
+    };
+
     fetchRequests();
-  }, []);
+  }, [dispatch]);
 
   return (
-    <div className="text-center my-10">
-      <h1 className="font-bold text-3xl text-pink-400">Connection Requests</h1>
-      {requests.length === 0 ? (
-        <p className="text-gray-500 text-lg font-medium mt-10">
-          No connection requests available.
-        </p>
-      ) : (
-        requests.map((req) => {
-          if (!req.fromUserId) return null; 
+    <div className="min-h-screen bg-slate-50">
+      <main className="max-w-4xl mx-auto px-6 py-12">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl font-bold text-slate-900 mb-3">
+            Connection Requests
+          </h1>
+          <p className="text-slate-600">
+            Review and manage incoming connection requests
+          </p>
+        </div>
 
-          const { _id, firstName, lastName, photoUrl, age, about } =
-            req.fromUserId;
-
-          return (
-            <div
-              key={_id}
-              className="mt-4 m-10 min-h-[180px] p-5 w-1/2 bg-slate-300 rounded-2xl flex shadow-lg hover:shadow-xl transition-shadow duration-300 mx-auto items-center"
-            >
-              <img
-                className="w-28 h-28 rounded-full object-cover border-4 border-pink-400 flex-shrink-0"
-                alt="Profile"
-                src={
-                  photoUrl ||
-                  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpCKq1XnPYYDaUIlwlsvmLPZ-9-rdK28RToA&s"
-                }
-              />
-              <div className="ml-6 flex-1">
-                <h2 className="text-gray-800 text-xl font-semibold">
-                  {firstName} {lastName}
-                </h2>
-                {age && <h3 className="text-black mt-1 text-sm">Age: {age}</h3>}
-                <p className="text-black mt-1 text-sm line-clamp-2">
-                  Profession: {about}
-                </p>
-              </div>
-              <div className="flex gap-4 ml-4">
-                <button
-                  className="bg-pink-300 hover:bg-pink-600 text-white py-2 px-4 rounded-lg"
-                  onClick={() => reviewRequest("accepted", req._id)}
-                >
-                  💓 Accept
-                </button>
-                <button
-                  className="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded-lg"
-                  onClick={() => reviewRequest("rejected", req._id)}
-                >
-                  👎 Reject
-                </button>
-              </div>
+        {requests.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-slate-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+              <svg
+                className="w-8 h-8 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                ></path>
+              </svg>
             </div>
-          );
-        })
-      )}
+            <p className="text-slate-500 text-lg">
+              No connection requests available.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {requests.map((req) => {
+              if (!req.fromUserId) return null;
+
+              const { _id, firstName, lastName, photoUrl, age, about } =
+                req.fromUserId;
+
+              return (
+                <div
+                  key={_id}
+                  className="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center space-x-6">
+                    <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+                      {photoUrl ? (
+                        <img
+                          className="w-full h-full object-cover"
+                          alt="Profile"
+                          src={photoUrl}
+                        />
+                      ) : (
+                        <svg
+                          className="w-8 h-8 text-slate-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          ></path>
+                        </svg>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-slate-900 text-lg">
+                        {firstName} {lastName}
+                      </h3>
+                      {age && (
+                        <p className="text-sm text-slate-500 mt-1">
+                          Age: {age}
+                        </p>
+                      )}
+                      <p className="text-sm text-slate-600 mt-2 line-clamp-2">
+                        {about || "No description available"}
+                      </p>
+                    </div>
+
+                    <div className="flex space-x-3 flex-shrink-0">
+                      <button
+                        className="bg-accent hover:bg-emerald-600 text-white px-6 py-2.5 rounded-xl font-medium transition-colors flex items-center space-x-2"
+                        onClick={() => reviewRequest("accepted", req._id)}
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 13l4 4L19 7"
+                          ></path>
+                        </svg>
+                        <span>Accept</span>
+                      </button>
+                      <button
+                        className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-xl font-medium transition-colors flex items-center space-x-2"
+                        onClick={() => reviewRequest("rejected", req._id)}
+                      >
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          ></path>
+                        </svg>
+                        <span>Reject</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
     </div>
   );
 };

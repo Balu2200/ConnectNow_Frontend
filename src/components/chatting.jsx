@@ -42,44 +42,84 @@ const Chatting = () => {
   };
 
   return (
-    <div className="w-full max-w-md h-[85vh] mt-3 mx-auto flex flex-col bg-gradient-to-r from-gray-900 to-black text-white shadow-lg rounded-xl overflow-hidden">
-      {/* Chat Header */}
-      <div className="bg-gradient-to-r from-blue-700 to-blue-900 p-4 text-center font-semibold text-lg">
-        Chat Room
-      </div>
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        {/* Chat Header */}
+        <div className="bg-primary px-6 py-4">
+          <h2 className="text-xl font-semibold text-white">Chat Room</h2>
+        </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-800 scrollbar-thin scrollbar-thumb-gray-600">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`p-3 rounded-xl max-w-[80%] break-words shadow-md ${
-              msg.firstName === user.firstName
-                ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white ml-auto"
-                : "bg-gray-700 text-white mr-auto"
-            }`}
-          >
-            <p className="text-sm font-semibold">{msg.firstName}</p>
-            <p>{msg.text}</p>
+        {/* Messages */}
+        <div className="h-96 bg-white p-6 overflow-y-auto">
+          {messages.length === 0 ? (
+            <div className="flex items-center justify-center h-full text-slate-400">
+              <div className="text-center">
+                <svg
+                  className="w-12 h-12 mx-auto mb-3 text-slate-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  ></path>
+                </svg>
+                <p className="text-sm">
+                  No messages yet. Start a conversation!
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {messages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`flex ${
+                    msg.firstName === user.firstName
+                      ? "justify-end"
+                      : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
+                      msg.firstName === user.firstName
+                        ? "bg-primary text-white rounded-tr-sm"
+                        : "bg-slate-100 text-slate-700 rounded-tl-sm"
+                    }`}
+                  >
+                    <p className="text-xs font-medium mb-1 opacity-75">
+                      {msg.firstName}
+                    </p>
+                    <p className="text-sm">{msg.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Input Box */}
+        <div className="border-t border-slate-200 p-4">
+          <div className="flex items-center space-x-3">
+            <input
+              type="text"
+              placeholder="Type your message..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+              className="flex-1 px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder-slate-400"
+            />
+            <button
+              onClick={sendMessage}
+              className="bg-primary hover:bg-blue-700 text-white p-3 rounded-xl transition-colors"
+            >
+              <MdSend size={20} />
+            </button>
           </div>
-        ))}
-      </div>
-
-      {/* Input Box */}
-      <div className="flex items-center p-3 bg-gray-900 border-t border-gray-700">
-        <input
-          type="text"
-          placeholder="Type your message..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          className="flex-1 p-3 text-white bg-gray-800 rounded-lg focus:outline-none placeholder-gray-400"
-        />
-        <button
-          onClick={sendMessage}
-          className="ml-3 p-3 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full text-white hover:from-blue-600 hover:to-blue-800 transition"
-        >
-          <MdSend size={24} />
-        </button>
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import PropTypes from "prop-types";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeFromFeed } from "../utils/feedSlice";
@@ -7,7 +8,7 @@ import { removeFromFeed } from "../utils/feedSlice";
 const Usercard = ({ user }) => {
   const { _id, photoUrl, firstName, lastName, about, skills } = user;
   const dispatch = useDispatch();
-  const [responseStatus, setResponseStatus] = useState(null); 
+  const [responseStatus, setResponseStatus] = useState(null);
 
   const handleSendRequest = async (status, userId) => {
     try {
@@ -31,74 +32,100 @@ const Usercard = ({ user }) => {
   };
 
   return (
-    <div className="w-80 bg-gray-900 shadow-lg rounded-lg overflow-hidden border border-gray-700">
-      <div className="flex justify-center p-5">
-        <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-gray-700">
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center max-w-sm">
+      <div className="w-24 h-24 bg-slate-100 rounded-full mx-auto mb-6 flex items-center justify-center overflow-hidden">
+        {photoUrl ? (
           <img
-            src={
-              photoUrl ||
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpCKq1XnPYYDaUIlwlsvmLPZ-9-rdK28RToA&s"
-            }
+            src={photoUrl}
             alt="User"
             className="w-full h-full object-cover"
           />
-        </div>
+        ) : (
+          <svg
+            className="w-12 h-12 text-slate-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            ></path>
+          </svg>
+        )}
       </div>
 
-      <div className="p-5 text-center">
-        <h2 className="text-xl font-semibold text-white">
-          {firstName} {lastName}
-        </h2>
+      <h2 className="text-2xl font-bold text-slate-900 mb-2">
+        {firstName} {lastName}
+      </h2>
+
+      <div className="mb-6">
         {skills && (
-          <p className="text-gray-400 text-sm mt-1">
-            <span className="font-semibold text-gray-300">Skills:</span>{" "}
-            {skills}
+          <p className="text-sm font-medium text-slate-700 mb-2">
+            Skills: {skills}
           </p>
         )}
-        <p className="text-gray-300 mt-3 text-sm">{about}</p>
+        <p className="text-sm text-slate-600">
+          {about || "No description available"}
+        </p>
+      </div>
 
-        {responseStatus && (
-          <p
-            className={`mt-4 font-semibold ${
-              responseStatus === "Interested"
-                ? "text-green-400"
-                : "text-red-400"
-            }`}
-          >
+      {responseStatus && (
+        <div
+          className={`mb-6 p-3 rounded-lg ${
+            responseStatus === "Interested"
+              ? "bg-accent/10 text-accent"
+              : "bg-slate-100 text-slate-600"
+          }`}
+        >
+          <p className="font-medium">
             {responseStatus === "Interested"
-              ? "Connection request sent!"
-              : "User ignored."}
+              ? "✓ Connection request sent!"
+              : "User ignored"}
           </p>
-        )}
-
-        <div className="flex justify-center space-x-4 mt-6">
-          <button
-            className={`px-4 py-2 font-medium rounded-md shadow-md transition-all duration-200 ${
-              responseStatus === "Ignored"
-                ? "bg-gray-500 text-gray-300 cursor-not-allowed"
-                : "bg-gray-700 text-white hover:bg-gray-600"
-            }`}
-            onClick={() => handleSendRequest("ignore", _id)}
-            disabled={responseStatus !== null}
-          >
-            {responseStatus === "Ignored" ? "Ignored" : "Ignore"}
-          </button>
-
-          <button
-            className={`px-4 py-2 font-medium rounded-md shadow-md transition-all duration-200 ${
-              responseStatus === "Interested"
-                ? "bg-green-500 text-white cursor-not-allowed"
-                : "bg-blue-600 text-white hover:bg-blue-500"
-            }`}
-            onClick={() => handleSendRequest("interested", _id)}
-            disabled={responseStatus !== null}
-          >
-            {responseStatus === "Interested" ? "Request Sent" : "Interested"}
-          </button>
         </div>
+      )}
+
+      <div className="flex space-x-4">
+        <button
+          className={`flex-1 py-3 rounded-xl font-medium transition-colors ${
+            responseStatus === "Ignored"
+              ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+              : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+          }`}
+          onClick={() => handleSendRequest("ignore", _id)}
+          disabled={responseStatus !== null}
+        >
+          {responseStatus === "Ignored" ? "Ignored" : "Ignore"}
+        </button>
+
+        <button
+          className={`flex-1 py-3 rounded-xl font-medium transition-colors ${
+            responseStatus === "Interested"
+              ? "bg-accent text-white cursor-not-allowed"
+              : "bg-accent hover:bg-emerald-600 text-white"
+          }`}
+          onClick={() => handleSendRequest("interested", _id)}
+          disabled={responseStatus !== null}
+        >
+          {responseStatus === "Interested" ? "Request Sent" : "Interested"}
+        </button>
       </div>
     </div>
   );
+};
+
+Usercard.propTypes = {
+  user: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    photoUrl: PropTypes.string,
+    firstName: PropTypes.string.isRequired,
+    lastName: PropTypes.string,
+    about: PropTypes.string,
+    skills: PropTypes.string,
+  }).isRequired,
 };
 
 export default Usercard;

@@ -10,11 +10,12 @@ import Connections from "./components/connections";
 import Receivedrequests from "./components/receivedrequests";
 import Chatbot from "./components/chatbot";
 import Chatting from "./components/chatting";
+import FloatingChatbot from "./components/FloatingChatbot";
 
 function App() {
   return (
     <Provider store={appStore}>
-      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50">
+      <div className="min-h-screen bg-slate-50">
         <BrowserRouter basename="/">
           <div className="animate-fade-in">
             <Routes>
@@ -29,6 +30,8 @@ function App() {
                 <Route path="/chat/:targetUserId" element={<Chatting />} />
               </Route>
             </Routes>
+            {/* Floating Chatbot - Available on all pages */}
+            <FloatingChatbot />
           </div>
         </BrowserRouter>
       </div>
