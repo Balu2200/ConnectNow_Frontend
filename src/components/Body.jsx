@@ -1,5 +1,5 @@
 import Navbar from "./navBar";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,9 +9,16 @@ import { useEffect } from "react";
 const Body = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const userData = useSelector((store) => store.user);
 
   useEffect(() => {
+    // Skip profile fetch if on public routes (login/signup)
+    const publicRoutes = ["/login", "/signup"];
+    if (publicRoutes.includes(location.pathname)) {
+      return;
+    }
+
     const fetchUser = async () => {
       if (userData) return;
       try {
@@ -27,11 +34,15 @@ const Body = () => {
       }
     };
     fetchUser();
-  }, [userData, dispatch, navigate]);
+  }, [userData, dispatch, navigate, location.pathname]);
+
+  // Check if we're on a public route
+  const isPublicRoute = ["/login", "/signup"].includes(location.pathname);
 
   return (
     <div>
-      <Navbar />
+      {/* Only show Navbar on protected routes */}
+      {!isPublicRoute && <Navbar />}
       <Outlet />
     </div>
   );
