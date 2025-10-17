@@ -32,8 +32,14 @@ const Signup = () => {
     if (!formData.lastName.trim()) return "Last name is required";
     if (!formData.email.trim()) return "Email is required";
     if (!formData.password) return "Password is required";
-    if (formData.password.length < 6)
-      return "Password must be at least 6 characters";
+    if (formData.password.length < 8)
+      return "Password must be at least 8 characters";
+
+    // Check if password contains at least one letter and one number
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      return "Password must contain at least one letter and one number";
+    }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) return "Please enter a valid email";
@@ -62,9 +68,54 @@ const Signup = () => {
         setTimeout(() => navigate("/login"), 2000);
       }
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Something went wrong. Please try again."
-      );
+      console.error("Signup error:", err);
+
+      // Handle different error scenarios
+      if (!err.response) {
+        // Network error
+        setError(
+          "Unable to connect to server. Please check your internet connection and try again."
+        );
+      } else if (err.response.status === 400) {
+        // Validation error
+        const message = err.response.data?.message || err.response.data;
+        if (typeof message === "string") {
+          if (message.toLowerCase().includes("email")) {
+            setError(
+              "Invalid email format. Please enter a valid email address."
+            );
+          } else if (message.toLowerCase().includes("password")) {
+            setError(
+              "Password must be at least 8 characters long and contain at least one letter and one number."
+            );
+          } else if (
+            message.toLowerCase().includes("duplicate") ||
+            message.toLowerCase().includes("already exists")
+          ) {
+            setError(
+              "An account with this email already exists. Please login or use a different email."
+            );
+          } else {
+            setError(message);
+          }
+        } else {
+          setError("Please check your input and try again.");
+        }
+      } else if (err.response.status === 409) {
+        // Conflict - duplicate user
+        setError(
+          "An account with this email already exists. Please login instead."
+        );
+      } else if (err.response.status >= 500) {
+        // Server error
+        setError("Server error. Please try again later.");
+      } else {
+        setError(
+          err.response?.data?.message ||
+            err.response?.data ||
+            "Something went wrong. Please try again."
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -208,7 +259,7 @@ const Signup = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 pl-12 pr-12 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-slate-50 transition-all"
-                  placeholder="Minimum 6 characters"
+                  placeholder="Minimum 8 characters"
                   required
                 />
                 <svg
@@ -267,7 +318,7 @@ const Signup = () => {
                 </button>
               </div>
               <div className="mt-2 text-xs text-slate-500">
-                Password must be at least 6 characters long
+                Password must be at least 8 characters with a letter and number
               </div>
             </div>
 

@@ -30,20 +30,30 @@ const Usercard = ({ user }) => {
       // In our current flow we remove from feed; if that changes, we could uncomment the following line:
       // dispatch(updateUserRequestInfo({ userId, requestInfo: { exists: true, status: "interested", direction: "outgoing" } }));
     } catch (err) {
+      console.error("Error in request:", err);
+
       // Rollback on failure
       dispatch(addUserToFeed(user));
-      dispatch(
-        addToast(
-          err?.response?.data?.message ||
-            "Failed to send request. Please try again.",
-          "error",
-          3500
-        )
-      );
-      console.error(
-        "Error in request:",
-        err.response ? err.response.data : err.message
-      );
+
+      let errorMessage = "Failed to send request. Please try again.";
+      if (!err.response) {
+        errorMessage =
+          "Network error. Please check your connection and try again.";
+      } else if (err.response.status === 401) {
+        errorMessage = "Session expired. Please login again.";
+      } else if (err.response.status === 400) {
+        errorMessage =
+          err.response?.data?.message || "Invalid request. Please try again.";
+      } else if (err.response.status === 409) {
+        errorMessage = "You've already sent a request to this user.";
+      } else if (err.response.status >= 500) {
+        errorMessage = "Server error. Please try again later.";
+      } else {
+        errorMessage =
+          err.response?.data?.message || err.response?.data || errorMessage;
+      }
+
+      dispatch(addToast(errorMessage, "error", 3500));
     }
   };
 
@@ -59,13 +69,23 @@ const Usercard = ({ user }) => {
       // dispatch(updateUserRequestInfo({ userId: _id, requestInfo: null }));
       dispatch(addToast("Request withdrawn", "success", 2500));
     } catch (err) {
-      dispatch(
-        addToast(
-          err?.response?.data?.message || "Failed to withdraw request.",
-          "error",
-          3500
-        )
-      );
+      console.error("Error withdrawing request:", err);
+
+      let errorMessage = "Failed to withdraw request.";
+      if (!err.response) {
+        errorMessage = "Network error. Please check your connection.";
+      } else if (err.response.status === 401) {
+        errorMessage = "Session expired. Please login again.";
+      } else if (err.response.status === 404) {
+        errorMessage = "Request not found or already withdrawn.";
+      } else if (err.response.status >= 500) {
+        errorMessage = "Server error. Please try again later.";
+      } else {
+        errorMessage =
+          err.response?.data?.message || err.response?.data || errorMessage;
+      }
+
+      dispatch(addToast(errorMessage, "error", 3500));
     } finally {
       setWithdrawing(false);
     }

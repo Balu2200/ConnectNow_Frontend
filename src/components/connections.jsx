@@ -16,6 +16,7 @@ const Connections = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [loading, setLoading] = useState(true);
   const [selectedConnection, setSelectedConnection] = useState(null);
+  const [error, setError] = useState(null);
 
   // Filtered and sorted connections
   const filteredConnections = useMemo(() => {
@@ -49,6 +50,8 @@ const Connections = () => {
   useEffect(() => {
     const fetchConnections = async () => {
       setLoading(true);
+      setError(null);
+
       try {
         const res = await axios.get(`${BASE_URL}/user/connections`, {
           withCredentials: true,
@@ -61,6 +64,24 @@ const Connections = () => {
         }
       } catch (err) {
         console.error("Error fetching connections:", err);
+
+        // Handle different error scenarios
+        if (!err.response) {
+          setError(
+            "Unable to load connections. Please check your internet connection."
+          );
+        } else if (err.response.status === 401) {
+          setError("Session expired. Please login again.");
+        } else if (err.response.status === 404) {
+          setError("No connections found.");
+        } else if (err.response.status >= 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          setError(
+            err.response?.data?.message ||
+              "Failed to load connections. Please try again."
+          );
+        }
       } finally {
         setLoading(false);
       }
@@ -252,6 +273,53 @@ const Connections = () => {
               </p>
             </div>
           </div>
+        ) : error ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-20"
+          >
+            <div className="max-w-md mx-auto">
+              <div className="w-24 h-24 bg-red-50 rounded-full mx-auto mb-6 flex items-center justify-center">
+                <svg
+                  className="w-12 h-12 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                Failed to Load Connections
+              </h3>
+              <p className="text-slate-600 mb-6">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+              >
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Retry
+              </button>
+            </div>
+          </motion.div>
         ) : filteredConnections.length === 0 ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}

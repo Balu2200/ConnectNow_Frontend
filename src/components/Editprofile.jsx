@@ -50,7 +50,33 @@ const EditProfile = ({ onViewProfile }) => {
       dispatch(addUser(res.data?.data));
       setSuccess(true);
     } catch (err) {
-      setError(err.message);
+      console.error("Profile update error:", err);
+
+      // Handle different error scenarios
+      if (!err.response) {
+        setError(
+          "Unable to connect to server. Please check your internet connection."
+        );
+      } else if (err.response.status === 401) {
+        setError("Session expired. Please login again.");
+      } else if (err.response.status === 400) {
+        const message = err.response.data?.message || err.response.data;
+        if (typeof message === "string") {
+          setError(message);
+        } else {
+          setError(
+            "Invalid input. Please check your information and try again."
+          );
+        }
+      } else if (err.response.status >= 500) {
+        setError("Server error. Please try again later.");
+      } else {
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Failed to update profile. Please try again."
+        );
+      }
     } finally {
       setLoading(false);
     }

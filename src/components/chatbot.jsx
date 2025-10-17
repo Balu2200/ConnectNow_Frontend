@@ -27,10 +27,29 @@ const Chatbot = () => {
         ...prevMessages,
         { sender: "bot", text: response.data.response },
       ]);
-    } catch {
+    } catch (err) {
+      console.error("Chatbot error:", err);
+
+      let errorMessage =
+        "I'm having trouble connecting right now. Please try again.";
+      if (!err.response) {
+        errorMessage =
+          "Connection lost. Please check your internet and try again.";
+      } else if (err.response.status === 401) {
+        errorMessage =
+          "Your session has expired. Please login again to continue.";
+      } else if (err.response.status === 429) {
+        errorMessage = "Too many requests. Please wait a moment and try again.";
+      } else if (err.response.status >= 500) {
+        errorMessage =
+          "Our chatbot service is temporarily unavailable. Please try again later.";
+      } else {
+        errorMessage = err.response?.data?.message || errorMessage;
+      }
+
       setMessages((prevMessages) => [
         ...prevMessages,
-        { sender: "bot", text: "Error connecting to chatbot." },
+        { sender: "bot", text: errorMessage },
       ]);
     }
     setInput("");

@@ -33,14 +33,28 @@ const FloatingChatbot = () => {
         ...prev,
         { sender: "bot", text: response.data.response },
       ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: "bot",
-          text: "I apologize, but I'm having trouble connecting right now. Please try again later or contact support if the issue persists.",
-        },
-      ]);
+    } catch (err) {
+      console.error("Chatbot error:", err);
+
+      let errorMessage =
+        "I apologize, but I'm having trouble connecting right now. Please try again later.";
+      if (!err.response) {
+        errorMessage =
+          "Connection lost. Please check your internet connection and try again.";
+      } else if (err.response.status === 401) {
+        errorMessage =
+          "Your session has expired. Please login again to continue chatting with me.";
+      } else if (err.response.status === 429) {
+        errorMessage =
+          "You're sending messages too quickly. Please wait a moment and try again.";
+      } else if (err.response.status >= 500) {
+        errorMessage =
+          "Our chatbot service is temporarily down. Please try again in a few minutes or contact support if the issue persists.";
+      } else {
+        errorMessage = err.response?.data?.message || errorMessage;
+      }
+
+      setMessages((prev) => [...prev, { sender: "bot", text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }

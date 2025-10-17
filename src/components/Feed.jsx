@@ -13,6 +13,7 @@ const Feed = () => {
   const [viewMode, setViewMode] = useState("stack"); // stack, grid
   const [isAutoPlay, setIsAutoPlay] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [error, setError] = useState(null);
 
   // Filter states
   const [filters, setFilters] = useState({
@@ -46,6 +47,8 @@ const Feed = () => {
         (Array.isArray(feed) && feed.length > 0);
       if (hasData) return;
 
+      setError(null);
+
       try {
         const res = await axios.get(BASE_URL + "/feed", {
           withCredentials: true,
@@ -54,6 +57,24 @@ const Feed = () => {
         dispatch(addFeed(res.data));
       } catch (err) {
         console.error("Feed API Error:", err);
+
+        // Handle different error scenarios
+        if (!err.response) {
+          setError(
+            "Unable to load feed. Please check your internet connection."
+          );
+        } else if (err.response.status === 401) {
+          setError("Session expired. Please login again.");
+        } else if (err.response.status === 404) {
+          setError("No users found to display.");
+        } else if (err.response.status >= 500) {
+          setError("Server error. Please try again later.");
+        } else {
+          setError(
+            err.response?.data?.message ||
+              "Failed to load feed. Please try again."
+          );
+        }
       }
     };
 
@@ -465,122 +486,17 @@ const Feed = () => {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-8">
-        {!feed ||
-        (Array.isArray(feed) && feed.length === 0) ||
-        (!feed.Data && !Array.isArray(feed)) ? (
-          <div className="text-center py-20">
-            <div className="w-20 h-20 bg-white rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
-              <svg
-                className="w-10 h-10 text-primary animate-spin"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                ></path>
-              </svg>
-            </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">
-              Loading Your Feed
-            </h3>
-            <p className="text-slate-600 text-lg">
-              Discovering amazing professionals for you...
-            </p>
-          </div>
-        ) : (feed.Data && feed.Data.length > 0) ||
-          (Array.isArray(feed) && feed.length > 0) ? (
-          filteredFeed.length > 0 ? (
-            <div className="relative">
-              {/* Stack View */}
-              {viewMode === "stack" && (
-                <div className="flex items-center justify-center min-h-[600px]">
-                  <div className="relative">
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={currentIndex}
-                        initial={{ opacity: 0, scale: 0.8, y: 50 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.8, y: -50 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 200,
-                          damping: 20,
-                        }}
-                        className="relative"
-                      >
-                        <Usercard user={filteredFeed[currentIndex]} />
-                      </motion.div>
-                    </AnimatePresence>
-
-                    {/* Navigation Arrows */}
-                    <button
-                      className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-20 w-14 h-14 bg-white border-2 border-slate-200 rounded-full flex items-center justify-center hover:bg-slate-50 hover:border-primary transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                      onClick={handlePrevious}
-                      disabled={currentIndex === 0}
-                    >
-                      <svg
-                        className="w-6 h-6 text-slate-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M15 19l-7-7 7-7"
-                        ></path>
-                      </svg>
-                    </button>
-
-                    <button
-                      className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-20 w-14 h-14 bg-white border-2 border-slate-200 rounded-full flex items-center justify-center hover:bg-slate-50 hover:border-primary transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-                      onClick={handleNext}
-                      disabled={currentIndex === filteredFeed.length - 1}
-                    >
-                      <svg
-                        className="w-6 h-6 text-slate-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 5l7 7-7 7"
-                        ></path>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Grid View */}
-              {viewMode === "grid" && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {getVisibleUsers().map((user, index) => (
-                    <motion.div
-                      key={user._id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <Usercard user={user} />
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <div className="w-20 h-20 bg-white rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
+        {/* Error State */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-20"
+          >
+            <div className="max-w-md mx-auto">
+              <div className="w-24 h-24 bg-red-50 rounded-full mx-auto mb-6 flex items-center justify-center">
                 <svg
-                  className="w-10 h-10 text-slate-400"
+                  className="w-12 h-12 text-red-500"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -589,65 +505,227 @@ const Feed = () => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                   ></path>
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2">
-                No Matches Found
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                Oops! Something went wrong
               </h3>
-              <p className="text-slate-600 text-lg mb-6">
-                Try adjusting your filters to see more profiles.
-              </p>
+              <p className="text-slate-600 mb-6">{error}</p>
               <button
-                onClick={resetFilters}
-                className="px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
+                onClick={() => {
+                  setError(null);
+                  dispatch(addFeed([])); // Clear feed to trigger refetch
+                }}
+                className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
               >
-                Clear Filters
-              </button>
-            </div>
-          )
-        ) : (
-          <div className="text-center py-20">
-            <div className="w-20 h-20 bg-white rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
-              <svg
-                className="w-10 h-10 text-slate-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                ></path>
-              </svg>
-            </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">
-              {filteredFeed.length === 0 && feed.Data?.length > 0
-                ? "No Matches Found"
-                : "No Connections Available"}
-            </h3>
-            <p className="text-slate-600 text-lg mb-6">
-              {filteredFeed.length === 0 && feed.Data?.length > 0
-                ? "Try adjusting your filters to see more profiles."
-                : "It looks like there are no new professionals to discover right now."}
-            </p>
-            <div className="flex space-x-4">
-              {filteredFeed.length === 0 && feed.Data?.length > 0 && (
-                <button
-                  onClick={resetFilters}
-                  className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-colors"
+                <svg
+                  className="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  Clear Filters
-                </button>
-              )}
-              <button className="px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-blue-700 transition-colors">
-                Refresh Feed
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  ></path>
+                </svg>
+                Try Again
               </button>
             </div>
-          </div>
+          </motion.div>
+        )}
+
+        {!error && (
+          <>
+            {!feed ||
+            (Array.isArray(feed) && feed.length === 0) ||
+            (!feed.Data && !Array.isArray(feed)) ? (
+              <div className="text-center py-20">
+                <div className="w-20 h-20 bg-white rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
+                  <svg
+                    className="w-10 h-10 text-primary animate-spin"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    ></path>
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                  Loading Your Feed
+                </h3>
+                <p className="text-slate-600 text-lg">
+                  Discovering amazing professionals for you...
+                </p>
+              </div>
+            ) : (feed.Data && feed.Data.length > 0) ||
+              (Array.isArray(feed) && feed.length > 0) ? (
+              filteredFeed.length > 0 ? (
+                <div className="relative">
+                  {/* Stack View */}
+                  {viewMode === "stack" && (
+                    <div className="flex items-center justify-center min-h-[600px]">
+                      <div className="relative">
+                        <AnimatePresence mode="wait">
+                          <motion.div
+                            key={currentIndex}
+                            initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.8, y: -50 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 200,
+                              damping: 20,
+                            }}
+                            className="relative"
+                          >
+                            <Usercard user={filteredFeed[currentIndex]} />
+                          </motion.div>
+                        </AnimatePresence>
+
+                        {/* Navigation Arrows */}
+                        <button
+                          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-20 w-14 h-14 bg-white border-2 border-slate-200 rounded-full flex items-center justify-center hover:bg-slate-50 hover:border-primary transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                          onClick={handlePrevious}
+                          disabled={currentIndex === 0}
+                        >
+                          <svg
+                            className="w-6 h-6 text-slate-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M15 19l-7-7 7-7"
+                            ></path>
+                          </svg>
+                        </button>
+
+                        <button
+                          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-20 w-14 h-14 bg-white border-2 border-slate-200 rounded-full flex items-center justify-center hover:bg-slate-50 hover:border-primary transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                          onClick={handleNext}
+                          disabled={currentIndex === filteredFeed.length - 1}
+                        >
+                          <svg
+                            className="w-6 h-6 text-slate-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 5l7 7-7 7"
+                            ></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Grid View */}
+                  {viewMode === "grid" && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {getVisibleUsers().map((user, index) => (
+                        <motion.div
+                          key={user._id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                        >
+                          <Usercard user={user} />
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-20">
+                  <div className="w-20 h-20 bg-white rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
+                    <svg
+                      className="w-10 h-10 text-slate-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      ></path>
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                    No Matches Found
+                  </h3>
+                  <p className="text-slate-600 text-lg mb-6">
+                    Try adjusting your filters to see more profiles.
+                  </p>
+                  <button
+                    onClick={resetFilters}
+                    className="px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )
+            ) : (
+              <div className="text-center py-20">
+                <div className="w-20 h-20 bg-white rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg">
+                  <svg
+                    className="w-10 h-10 text-slate-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    ></path>
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                  {filteredFeed.length === 0 && feed.Data?.length > 0
+                    ? "No Matches Found"
+                    : "No Connections Available"}
+                </h3>
+                <p className="text-slate-600 text-lg mb-6">
+                  {filteredFeed.length === 0 && feed.Data?.length > 0
+                    ? "Try adjusting your filters to see more profiles."
+                    : "It looks like there are no new professionals to discover right now."}
+                </p>
+                <div className="flex space-x-4">
+                  {filteredFeed.length === 0 && feed.Data?.length > 0 && (
+                    <button
+                      onClick={resetFilters}
+                      className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-medium transition-colors"
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                  <button className="px-6 py-3 bg-primary text-white rounded-xl font-medium hover:bg-blue-700 transition-colors">
+                    Refresh Feed
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

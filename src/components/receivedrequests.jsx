@@ -24,13 +24,22 @@ const ReceivedRequests = () => {
       dispatch(addToast(`Request ${status}`, "success", 2500));
     } catch (err) {
       console.error("Error reviewing request:", err);
-      dispatch(
-        addToast(
-          err?.response?.data?.message || "Failed to review request",
-          "error",
-          3500
-        )
-      );
+
+      let errorMessage = "Failed to review request";
+      if (!err.response) {
+        errorMessage = "Network error. Please check your connection.";
+      } else if (err.response.status === 401) {
+        errorMessage = "Session expired. Please login again.";
+      } else if (err.response.status === 404) {
+        errorMessage = "Request not found or already processed.";
+      } else if (err.response.status >= 500) {
+        errorMessage = "Server error. Please try again.";
+      } else {
+        errorMessage =
+          err.response?.data?.message || err.response?.data || errorMessage;
+      }
+
+      dispatch(addToast(errorMessage, "error", 3500));
     }
   };
 
@@ -42,13 +51,23 @@ const ReceivedRequests = () => {
       setSentRequests((prev) => prev.filter((r) => r._id !== requestId));
       dispatch(addToast("Request withdrawn", "success", 2500));
     } catch (err) {
-      dispatch(
-        addToast(
-          err?.response?.data?.message || "Failed to withdraw request",
-          "error",
-          3500
-        )
-      );
+      console.error("Error withdrawing request:", err);
+
+      let errorMessage = "Failed to withdraw request";
+      if (!err.response) {
+        errorMessage = "Network error. Please check your connection.";
+      } else if (err.response.status === 401) {
+        errorMessage = "Session expired. Please login again.";
+      } else if (err.response.status === 404) {
+        errorMessage = "Request not found or already withdrawn.";
+      } else if (err.response.status >= 500) {
+        errorMessage = "Server error. Please try again.";
+      } else {
+        errorMessage =
+          err.response?.data?.message || err.response?.data || errorMessage;
+      }
+
+      dispatch(addToast(errorMessage, "error", 3500));
     }
   };
 

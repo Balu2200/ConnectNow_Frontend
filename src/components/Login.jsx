@@ -33,10 +33,46 @@ const Login = () => {
       dispatch(addUser(response.data));
       navigate("/feed");
     } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Login failed. Check details and try again."
-      );
+      console.error("Login error:", err);
+
+      // Handle different error scenarios
+      if (!err.response) {
+        // Network error - no response from server
+        setError(
+          "Unable to connect to server. Please check your internet connection and try again."
+        );
+      } else if (err.response.status === 401) {
+        // Invalid credentials
+        const message = err.response.data?.message || err.response.data;
+        if (
+          typeof message === "string" &&
+          message.toLowerCase().includes("password")
+        ) {
+          setError("Incorrect password. Please try again.");
+        } else if (
+          typeof message === "string" &&
+          message.toLowerCase().includes("user not found")
+        ) {
+          setError(
+            "No account found with this email. Please check your email or sign up."
+          );
+        } else {
+          setError("Invalid email or password. Please try again.");
+        }
+      } else if (err.response.status === 400) {
+        // Bad request
+        setError("Please enter both email and password.");
+      } else if (err.response.status >= 500) {
+        // Server error
+        setError("Server error. Please try again later.");
+      } else {
+        // Other errors
+        setError(
+          err.response?.data?.message ||
+            err.response?.data ||
+            "Login failed. Please try again."
+        );
+      }
     } finally {
       setLoading(false);
     }
