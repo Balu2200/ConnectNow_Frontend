@@ -3,31 +3,71 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
-import { removeFromFeed } from "../utils/feedSlice";
+import { removeFromFeed, addUserToFeed } from "../utils/feedSlice";
+import { addToast } from "../utils/notificationsSlice";
+import { Link } from "react-router-dom";
 
 const Usercard = ({ user }) => {
   const { _id, photoUrl, firstName, lastName, about, skills } = user;
   const dispatch = useDispatch();
   const [responseStatus, setResponseStatus] = useState(null);
+  const [reqInfo, setReqInfo] = useState(user.requestInfo || null);
+  const [withdrawing, setWithdrawing] = useState(false);
 
   const handleSendRequest = async (status, userId) => {
+    if (reqInfo) return; // prevent sending if a request already exists
+    // Optimistic UI: remove immediately
+    setResponseStatus(status === "interested" ? "Interested" : "Ignored");
+    dispatch(removeFromFeed(userId));
+
     try {
       await axios.post(
         `${BASE_URL}/request/send/${status}/${userId}`,
         {},
         { withCredentials: true }
       );
-
-      // Set response message based on status
-      setResponseStatus(status === "interested" ? "Interested" : "Ignored");
-
-      // Remove the user from feed
-      dispatch(removeFromFeed(userId));
+      // Success: mark this user as having an outgoing pending request when coming from a context that doesn't remove them
+      // In our current flow we remove from feed; if that changes, we could uncomment the following line:
+      // dispatch(updateUserRequestInfo({ userId, requestInfo: { exists: true, status: "interested", direction: "outgoing" } }));
     } catch (err) {
+      // Rollback on failure
+      dispatch(addUserToFeed(user));
+      dispatch(
+        addToast(
+          err?.response?.data?.message ||
+            "Failed to send request. Please try again.",
+          "error",
+          3500
+        )
+      );
       console.error(
         "Error in request:",
         err.response ? err.response.data : err.message
       );
+    }
+  };
+
+  const handleWithdraw = async () => {
+    try {
+      setWithdrawing(true);
+      await axios.delete(`${BASE_URL}/request/withdraw/${_id}`, {
+        withCredentials: true,
+      });
+      setReqInfo(null);
+      setResponseStatus(null);
+      // Reflect in global feed if this card appears elsewhere
+      // dispatch(updateUserRequestInfo({ userId: _id, requestInfo: null }));
+      dispatch(addToast("Request withdrawn", "success", 2500));
+    } catch (err) {
+      dispatch(
+        addToast(
+          err?.response?.data?.message || "Failed to withdraw request.",
+          "error",
+          3500
+        )
+      );
+    } finally {
+      setWithdrawing(false);
     }
   };
 
@@ -89,29 +129,69 @@ const Usercard = ({ user }) => {
       )}
 
       <div className="flex space-x-4">
-        <button
-          className={`flex-1 py-3 rounded-xl font-medium transition-colors ${
-            responseStatus === "Ignored"
-              ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-              : "bg-slate-100 hover:bg-slate-200 text-slate-700"
-          }`}
-          onClick={() => handleSendRequest("ignore", _id)}
-          disabled={responseStatus !== null}
-        >
-          {responseStatus === "Ignored" ? "Ignored" : "Ignore"}
-        </button>
-
-        <button
-          className={`flex-1 py-3 rounded-xl font-medium transition-colors ${
-            responseStatus === "Interested"
-              ? "bg-accent text-white cursor-not-allowed"
-              : "bg-accent hover:bg-emerald-600 text-white"
-          }`}
-          onClick={() => handleSendRequest("interested", _id)}
-          disabled={responseStatus !== null}
-        >
-          {responseStatus === "Interested" ? "Request Sent" : "Interested"}
-        </button>
+        {reqInfo && reqInfo.status === "interested" ? (
+          reqInfo.direction === "outgoing" ? (
+            <>
+              <button
+                onClick={handleWithdraw}
+                disabled={withdrawing}
+                className={`flex-1 py-3 rounded-xl font-medium transition-colors border ${
+                  withdrawing
+                    ? "bg-slate-200 text-slate-500 cursor-not-allowed border-slate-200"
+                    : "bg-white hover:bg-rose-50 text-rose-700 border-rose-200"
+                }`}
+              >
+                {withdrawing ? "Withdrawing..." : "Withdraw"}
+              </button>
+              <button
+                disabled
+                className="flex-1 py-3 rounded-xl font-medium bg-accent/10 text-accent cursor-not-allowed"
+              >
+                Pending
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                disabled
+                className="flex-1 py-3 rounded-xl font-medium bg-accent/10 text-accent cursor-not-allowed"
+              >
+                Pending
+              </button>
+              <Link
+                to="/requestreceived"
+                className="flex-1 py-3 rounded-xl font-semibold text-white bg-primary hover:bg-blue-700 text-center"
+              >
+                Review
+              </Link>
+            </>
+          )
+        ) : (
+          <>
+            <button
+              className={`flex-1 py-3 rounded-xl font-medium transition-colors ${
+                responseStatus === "Ignored"
+                  ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                  : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+              }`}
+              onClick={() => handleSendRequest("ignore", _id)}
+              disabled={responseStatus !== null}
+            >
+              {responseStatus === "Ignored" ? "Ignored" : "Ignore"}
+            </button>
+            <button
+              className={`flex-1 py-3 rounded-xl font-medium transition-colors ${
+                responseStatus === "Interested"
+                  ? "bg-accent text-white cursor-not-allowed"
+                  : "bg-accent hover:bg-emerald-600 text-white"
+              }`}
+              onClick={() => handleSendRequest("interested", _id)}
+              disabled={responseStatus !== null}
+            >
+              {responseStatus === "Interested" ? "Request Sent" : "Interested"}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
@@ -125,6 +205,12 @@ Usercard.propTypes = {
     lastName: PropTypes.string,
     about: PropTypes.string,
     skills: PropTypes.string,
+    requestInfo: PropTypes.shape({
+      exists: PropTypes.bool,
+      status: PropTypes.string,
+      direction: PropTypes.string,
+      requestId: PropTypes.string,
+    }),
   }).isRequired,
 };
 

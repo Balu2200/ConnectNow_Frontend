@@ -98,12 +98,14 @@ const Feed = () => {
     console.log("Initial feed data:", filtered.length, filtered);
     console.log("Current filters:", filters);
 
-    // TEMPORARILY DISABLE FILTERING FOR DEBUG
-    setFilteredFeed(filtered);
-    console.log("Setting filtered feed to all users for debug:", filtered);
+    // Filter out users with requestInfo (they'll be shown in the requests page)
+    const fresh = filtered.filter((u) => !u.requestInfo);
+
+    // For main view, use only new users
+    setFilteredFeed(fresh);
 
     // Reset current index if it's out of bounds
-    if (currentIndex >= filtered.length) {
+    if (currentIndex >= fresh.length) {
       setCurrentIndex(0);
     }
   }, [feed, filters, currentIndex]);

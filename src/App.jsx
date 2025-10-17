@@ -11,6 +11,7 @@ import Receivedrequests from "./components/receivedrequests";
 import Chatbot from "./components/chatbot";
 import Chatting from "./components/chatting";
 import FloatingChatbot from "./components/FloatingChatbot";
+import ToastContainer from "./components/ToastContainer";
 
 function App() {
   return (
@@ -34,6 +35,8 @@ function App() {
             <FloatingChatbot />
           </div>
         </BrowserRouter>
+        {/* Global Toasts */}
+        <ToastContainer />
       </div>
     </Provider>
   );

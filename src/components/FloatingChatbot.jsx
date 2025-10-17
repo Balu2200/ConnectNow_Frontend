@@ -8,7 +8,7 @@ const FloatingChatbot = () => {
   const [messages, setMessages] = useState([
     {
       sender: "bot",
-      text: "Hi! I'm your CodeCircle assistant. How can I help you today?",
+      text: "Hi! I'm your ConnectNow assistant. How can I help you today?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -72,7 +72,7 @@ const FloatingChatbot = () => {
         break;
       case "What are the platform features?":
         botResponse =
-          "CodeCircle offers: ✨ Profile management, 🔍 Discovery feed with filters, 🤝 Connection requests, 💬 Real-time chat, 🎯 Skills-based matching, and 📱 Mobile-responsive design. Explore each section to get the most out of your networking!";
+          "ConnectNow offers: ✨ Profile management, 🔍 Discovery feed with filters, 🤝 Connection requests, 💬 Real-time chat, 🎯 Skills-based matching, and 📱 Mobile-responsive design. Explore each section to get the most out of your networking!";
         break;
       case "Help with my profile":
         botResponse =
@@ -84,7 +84,7 @@ const FloatingChatbot = () => {
         break;
       default:
         botResponse =
-          "I'm here to help! Feel free to ask me anything about CodeCircle.";
+          "I'm here to help! Feel free to ask me anything about ConnectNow.";
     }
 
     setTimeout(() => {
@@ -174,7 +174,7 @@ const FloatingChatbot = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-white">
-                    CodeCircle Assistant
+                    ConnectNow Assistant
                   </h3>
                   <p className="text-xs text-white/80">
                     Online • Ready to help

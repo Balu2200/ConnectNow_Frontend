@@ -121,10 +121,10 @@ const Signup = () => {
           {/* Logo and Header */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-br from-primary to-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg shadow-primary/25">
-              <span className="text-white font-bold text-xl">CC</span>
+              <span className="text-white font-bold text-xl">CN</span>
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-2">
-              Join CodeCircle
+              Join ConnectNow
             </h1>
             <p className="text-slate-600">
               Connect with talented professionals worldwide
@@ -365,7 +365,7 @@ const Signup = () => {
 
         {/* Footer */}
         <div className="text-center mt-8 text-slate-500 text-sm">
-          <p>© 2025 CodeCircle. All rights reserved.</p>
+          <p>© 2025 ConnectNow. All rights reserved.</p>
         </div>
       </div>
     </div>

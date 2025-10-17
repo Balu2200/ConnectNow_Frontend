@@ -64,12 +64,12 @@ function Navbar() {
                 className="relative"
               >
                 <div className="w-10 h-10 bg-gradient-to-br from-primary to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/30 transition-shadow">
-                  <span className="text-white font-bold text-sm">CC</span>
+                  <span className="text-white font-bold text-sm">CN</span>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-br from-primary to-blue-600 rounded-xl opacity-0 group-hover:opacity-20 transition-opacity"></div>
               </motion.div>
               <span className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
-                CodeCircle
+                ConnectNow
               </span>
             </Link>
 
