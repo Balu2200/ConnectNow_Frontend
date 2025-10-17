@@ -1,1 +1,1 @@
-export const BASE_URL = "http://localhost:1234/api";
+export const BASE_URL = "https://connectnow-backend-m98p.onrender.com/api";
