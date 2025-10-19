@@ -12,6 +12,7 @@ import Chatbot from "./components/chatbot";
 import Chatting from "./components/chatting";
 import FloatingChatbot from "./components/FloatingChatbot";
 import ToastContainer from "./components/ToastContainer";
+import Home from "./components/Home";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <div className="animate-fade-in">
             <Routes>
               <Route path="/" element={<Body />}>
+                <Route index element={<Home />} />
                 <Route path="/feed" element={<Feed />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />

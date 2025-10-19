@@ -44,20 +44,20 @@ function Navbar() {
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        className={`fixed top-4 left-0 right-0 mx-auto z-50 w-[calc(100%-2rem)] max-w-7xl transition-all duration-300 rounded-full ${
           isScrolled
-            ? "bg-white/90 backdrop-blur-xl border-b border-slate-200/50 shadow-lg shadow-slate-200/20"
-            : "bg-white/95 backdrop-blur-sm"
+            ? "bg-white/70 backdrop-blur-xl border border-white/20 shadow-xl shadow-slate-300/20"
+            : "bg-white/40 backdrop-blur-lg border border-white/20 shadow-lg"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="px-4 md:px-6">
           <div
             className={`flex items-center justify-between transition-all duration-300 ${
-              isScrolled ? "py-3" : "py-4"
+              isScrolled ? "py-2.5" : "py-3"
             }`}
           >
             {/* Logo */}
-            <Link to="/feed" className="flex items-center space-x-3 group">
+            <Link to="/" className="flex items-center space-x-3 group">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -77,7 +77,7 @@ function Navbar() {
               <div className="flex items-center space-x-6">
                 {/* Desktop Navigation */}
                 <nav className="hidden lg:flex items-center">
-                  <div className="flex items-center bg-slate-50/80 backdrop-blur-sm rounded-2xl p-1.5 space-x-1">
+                  <div className="flex items-center bg-white/60 backdrop-blur-sm rounded-2xl p-1.5 space-x-1 border border-white/30 shadow-sm">
                     {[
                       {
                         path: "/feed",
@@ -137,7 +137,7 @@ function Navbar() {
 
                 {/* User Profile Section */}
                 <div className="hidden md:flex items-center space-x-4">
-                  <div className="flex items-center space-x-3 bg-slate-50/80 backdrop-blur-sm rounded-2xl px-4 py-2.5">
+                  <div className="flex items-center space-x-3 bg-white/60 backdrop-blur-sm rounded-2xl px-4 py-2.5 border border-white/30 shadow-sm">
                     <div className="w-8 h-8 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center">
                       <span className="text-white font-medium text-xs">
                         {user.firstName?.[0]?.toUpperCase()}
@@ -155,7 +155,7 @@ function Navbar() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={handleLogout}
-                    className="bg-gradient-to-r from-slate-100 to-slate-50 hover:from-slate-200 hover:to-slate-100 text-slate-700 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-slate-200/50 shadow-sm hover:shadow-md"
+                    className="bg-gradient-to-r from-slate-100/80 to-slate-50/80 hover:from-slate-200/80 hover:to-slate-100/80 text-slate-700 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 border border-white/40 shadow-sm hover:shadow-md"
                   >
                     <div className="flex items-center space-x-2">
                       <svg
@@ -179,7 +179,7 @@ function Navbar() {
                 {/* Mobile Menu Button */}
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="lg:hidden p-2 rounded-xl bg-slate-50/80 backdrop-blur-sm border border-slate-200/50"
+                  className="lg:hidden p-2 rounded-xl bg-white/60 backdrop-blur-sm border border-white/30 shadow-sm"
                 >
                   <svg
                     className="w-5 h-5 text-slate-700"
@@ -214,12 +214,12 @@ function Navbar() {
       <AnimatePresence>
         {isMobileMenuOpen && user && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="fixed top-[72px] left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-b border-slate-200/50 shadow-lg lg:hidden"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="fixed top-24 left-0 right-0 mx-auto z-40 w-[calc(100%-2rem)] max-w-7xl bg-white/80 backdrop-blur-xl border border-white/30 shadow-xl rounded-2xl lg:hidden"
           >
-            <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="px-6 py-4">
               <div className="space-y-4">
                 {/* Mobile Navigation Links */}
                 <div className="space-y-2">
@@ -252,7 +252,7 @@ function Navbar() {
                       className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${
                         isActiveRoute(item.path)
                           ? "bg-primary text-white"
-                          : "text-slate-600 hover:bg-slate-100"
+                          : "text-slate-700 hover:bg-white/70 border border-white/30"
                       }`}
                     >
                       <svg
@@ -274,10 +274,10 @@ function Navbar() {
                 </div>
 
                 {/* Mobile User Info & Logout */}
-                <div className="pt-4 border-t border-slate-200">
+                <div className="pt-4 border-t border-white/30">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center">
+                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center shadow-md">
                         <span className="text-white font-medium text-sm">
                           {user.firstName?.[0]?.toUpperCase()}
                         </span>
@@ -291,7 +291,7 @@ function Navbar() {
                     </div>
                     <button
                       onClick={handleLogout}
-                      className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl font-medium transition-colors"
+                      className="bg-white/70 hover:bg-white text-slate-700 px-4 py-2 rounded-xl font-medium transition-colors border border-white/30 shadow-sm"
                     >
                       Logout
                     </button>
@@ -304,7 +304,7 @@ function Navbar() {
       </AnimatePresence>
 
       {/* Spacer to prevent content from hiding behind floating nav */}
-      <div className="h-20"></div>
+      <div className="h-28"></div>
     </>
   );
 }

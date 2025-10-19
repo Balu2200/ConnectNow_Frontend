@@ -10,35 +10,19 @@ const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const dispatch = useDispatch();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [viewMode, setViewMode] = useState("stack"); // stack, grid
-  const [isAutoPlay, setIsAutoPlay] = useState(false);
+  const [viewMode, setViewMode] = useState("grid"); // stack, grid
   const [showFilters, setShowFilters] = useState(false);
   const [error, setError] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(9);
 
   // Filter states
   const [filters, setFilters] = useState({
-    ageRange: { min: 18, max: 65 },
     skills: "",
     location: "",
-    sortBy: "newest", // newest, oldest, nameAZ, nameZA, ageAsc, ageDesc
+    sortBy: "newest", // newest, oldest, nameAZ, nameZA
   });
   const [filteredFeed, setFilteredFeed] = useState([]);
 
-  // Auto-play functionality
-  useEffect(() => {
-    if (!isAutoPlay || !filteredFeed || filteredFeed.length === 0) return;
-
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => {
-        if (prevIndex >= filteredFeed.length - 1) {
-          return 0; // Loop back to start
-        }
-        return prevIndex + 1;
-      });
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [isAutoPlay, filteredFeed]);
   useEffect(() => {
     const getFeed = async () => {
       // Check if feed already has data
@@ -93,9 +77,7 @@ const Feed = () => {
     }
   };
 
-  const toggleAutoPlay = () => {
-    setIsAutoPlay(!isAutoPlay);
-  };
+  // Removed autoplay feature
 
   // Apply filters to feed data
   useEffect(() => {
@@ -144,15 +126,27 @@ const Feed = () => {
 
   const resetFilters = () => {
     setFilters({
-      ageRange: { min: 18, max: 65 },
       skills: "",
       location: "",
       sortBy: "newest",
     });
   };
 
+  const loadMore = () => {
+    setVisibleCount((c) => c + 9);
+  };
+
+  const visibleUsersForGrid = () =>
+    getVisibleUsers().slice(0, Math.min(visibleCount, filteredFeed.length));
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Decorative background */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] rounded-full bg-emerald-200/20 blur-3xl" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[50rem] h-[50rem] rounded-full bg-blue-100/30 blur-3xl" />
+      </div>
       {/* Header Section */}
       <div className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-6 py-6">
@@ -214,41 +208,7 @@ const Feed = () => {
                 ))}
               </div>
 
-              {/* Auto-play Toggle */}
-              {viewMode === "stack" && (
-                <button
-                  onClick={toggleAutoPlay}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all ${
-                    isAutoPlay
-                      ? "bg-accent text-white"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    {isAutoPlay ? (
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    ) : (
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M15 14h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      ></path>
-                    )}
-                  </svg>
-                  <span>{isAutoPlay ? "Stop" : "Auto"}</span>
-                </button>
-              )}
+              {/* Auto-play removed */}
 
               {/* Filter Toggle */}
               <button
@@ -275,7 +235,7 @@ const Feed = () => {
 
           {/* Stats Bar */}
           {feed.Data && feed.Data.length > 0 && (
-            <div className="mt-6 flex items-center justify-between bg-slate-50 rounded-xl p-4">
+            <div className="mt-6 flex items-center justify-between bg-white/60 backdrop-blur-md rounded-xl p-4 border border-slate-200">
               <div className="flex items-center space-x-6">
                 <div className="flex items-center space-x-2">
                   <div className="w-3 h-3 bg-primary rounded-full"></div>
@@ -342,47 +302,7 @@ const Feed = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {/* Age Range Filter */}
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-3">
-                      Age Range
-                    </label>
-                    <div className="space-y-3">
-                      <div className="flex items-center space-x-3">
-                        <input
-                          type="number"
-                          value={filters.ageRange.min}
-                          onChange={(e) =>
-                            handleFilterChange("ageRange", {
-                              ...filters.ageRange,
-                              min: parseInt(e.target.value) || 18,
-                            })
-                          }
-                          className="w-20 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
-                          min="18"
-                          max="100"
-                        />
-                        <span className="text-slate-500">to</span>
-                        <input
-                          type="number"
-                          value={filters.ageRange.max}
-                          onChange={(e) =>
-                            handleFilterChange("ageRange", {
-                              ...filters.ageRange,
-                              max: parseInt(e.target.value) || 65,
-                            })
-                          }
-                          className="w-20 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
-                          min="18"
-                          max="100"
-                        />
-                      </div>
-                      <div className="text-xs text-slate-500">
-                        Age between {filters.ageRange.min} and{" "}
-                        {filters.ageRange.max}
-                      </div>
-                    </div>
-                  </div>
+                  {/* Skills Filter */}
 
                   {/* Skills Filter */}
                   <div>
@@ -458,10 +378,7 @@ const Feed = () => {
                         </span>{" "}
                         profiles match your filters
                       </div>
-                      {(filters.skills ||
-                        filters.location ||
-                        filters.ageRange.min !== 18 ||
-                        filters.ageRange.max !== 65) && (
+                      {(filters.skills || filters.location) && (
                         <div className="flex items-center space-x-2">
                           <div className="w-2 h-2 bg-accent rounded-full"></div>
                           <span className="text-xs text-slate-500">
@@ -638,18 +555,41 @@ const Feed = () => {
 
                   {/* Grid View */}
                   {viewMode === "grid" && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {getVisibleUsers().map((user, index) => (
-                        <motion.div
-                          key={user._id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                        >
-                          <Usercard user={user} />
-                        </motion.div>
-                      ))}
-                    </div>
+                    <>
+                      {/* Spotlight hero card */}
+                      {filteredFeed.length > 0 && (
+                        <div className="mb-8">
+                          <Usercard
+                            user={filteredFeed[0]}
+                            variant="spotlight"
+                          />
+                        </div>
+                      )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {visibleUsersForGrid()
+                          .slice(filteredFeed.length > 0 ? 1 : 0)
+                          .map((user, index) => (
+                            <motion.div
+                              key={user._id}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.05 }}
+                            >
+                              <Usercard user={user} />
+                            </motion.div>
+                          ))}
+                      </div>
+                      {visibleCount < filteredFeed.length && (
+                        <div className="flex justify-center mt-10">
+                          <button
+                            onClick={loadMore}
+                            className="px-6 py-3 bg-white/70 backdrop-blur-md border border-slate-200 hover:bg-white rounded-xl font-medium text-slate-700 shadow-sm"
+                          >
+                            Load more
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               ) : (
