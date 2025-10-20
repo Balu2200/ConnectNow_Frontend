@@ -73,6 +73,24 @@ function Navbar() {
               </span>
             </Link>
 
+            {/* Show login button if user not logged in */}
+            {!user && (
+              <div className="flex items-center space-x-3">
+                <Link
+                  to="/login"
+                  className="px-5 py-2.5 rounded-xl bg-white/60 backdrop-blur-sm border border-white/30 text-slate-700 font-medium hover:bg-white transition-all shadow-sm"
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/signup"
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-blue-600 text-white font-semibold hover:shadow-lg transition-all shadow-sm"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+
             {user && (
               <div className="flex items-center space-x-6">
                 {/* Desktop Navigation */}
