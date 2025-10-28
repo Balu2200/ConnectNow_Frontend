@@ -7,7 +7,7 @@ const ToastContainer = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Set timeouts for each toast
+   
     const timers = toasts.map((t) =>
       setTimeout(() => dispatch(removeToast(t.id)), t.timeout || 3000)
     );

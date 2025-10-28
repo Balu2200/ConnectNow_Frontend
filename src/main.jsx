@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App.jsx";
 import axios from "axios";
 
-// Always include cookies for cross-site requests (token cookie auth)
+
 axios.defaults.withCredentials = true;
 
 createRoot(document.getElementById("root")).render(

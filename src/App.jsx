@@ -33,11 +33,9 @@ function App() {
                 <Route path="/chat/:targetUserId" element={<Chatting />} />
               </Route>
             </Routes>
-            {/* Floating Chatbot - Available on all pages */}
             <FloatingChatbot />
           </div>
         </BrowserRouter>
-        {/* Global Toasts */}
         <ToastContainer />
       </div>
     </Provider>

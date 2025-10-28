@@ -20,7 +20,7 @@ const Chatting = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [isOnline] = useState(true); // Can be enhanced with real online status
+  const [isOnline] = useState(true); 
   const user = useSelector((store) => store.user);
   const connections = useSelector((store) => store.connection);
   const safeConnections = useMemo(() => connections || [], [connections]);
@@ -37,7 +37,6 @@ const Chatting = () => {
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
-  // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -60,7 +59,7 @@ const Chatting = () => {
         ...prevMessages,
         { firstName, text, timestamp },
       ]);
-      // Update chat list meta
+
       const isIncoming = firstName !== user.firstName;
       dispatch(
         upsertLastMessage({
@@ -98,7 +97,7 @@ const Chatting = () => {
     };
   }, [userId, targetUserId, dispatch, user?.firstName]);
 
-  // Fetch connections for sidebar if not already in store
+ 
   useEffect(() => {
     const fetchConnections = async () => {
       if (!userId) return;
@@ -151,7 +150,6 @@ const Chatting = () => {
 
   const activeUser = safeConnections.find((c) => c?._id === targetUserId);
 
-  // Persist and mark read when opening a chat
   useEffect(() => {
     if (targetUserId) {
       dispatch(setLastOpenedChatId(targetUserId));
@@ -163,7 +161,6 @@ const Chatting = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
       <div className="h-screen max-w-6xl mx-auto px-4 py-6">
         <div className="h-full w-full rounded-2xl overflow-hidden bg-white/50 backdrop-blur-xl border border-white/30 shadow-xl flex">
-          {/* Sidebar (Connections) */}
           <aside className="hidden md:flex w-80 flex-col border-r border-white/30 bg-white/40 backdrop-blur-md">
             <div className="px-4 py-3 border-b border-white/30 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-slate-800">Chats</h3>
@@ -266,7 +263,6 @@ const Chatting = () => {
 
           {/* Chat Area */}
           <div className="flex-1 flex flex-col">
-            {/* Modern Chat Header (glassy) */}
             <div className="bg-white/60 backdrop-blur-xl border-b border-white/30">
               <div className="flex items-center justify-between px-4 md:px-6 py-3">
                 <div className="flex items-center space-x-4">
@@ -320,7 +316,6 @@ const Chatting = () => {
               </div>
             </div>
 
-            {/* Messages Container */}
             <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6 bg-gradient-to-br from-white/40 to-white/20">
               {messages.length === 0 ? (
                 <div className="flex items-center justify-center h-full">

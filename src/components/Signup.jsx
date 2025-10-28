@@ -34,8 +34,6 @@ const Signup = () => {
     if (!formData.password) return "Password is required";
     if (formData.password.length < 8)
       return "Password must be at least 8 characters";
-
-    // Check if password contains at least one letter and one number
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(formData.password)) {
       return "Password must contain at least one letter and one number";
@@ -70,9 +68,7 @@ const Signup = () => {
     } catch (err) {
       console.error("Signup error:", err);
 
-      // Handle different error scenarios
       if (!err.response) {
-        // Network error
         setError(
           "Unable to connect to server. Please check your internet connection and try again."
         );

@@ -6,7 +6,7 @@ const ViewProfile = ({ onEdit }) => {
   const user = useSelector((store) => store.user) || {};
   const { firstName, lastName, photoUrl, about, age, skills } = user;
 
-  // Safely parse skills to ensure it's a string
+
   const safeSkills = typeof skills === "string" ? skills.trim() : "";
   const skillsArray = safeSkills
     ? safeSkills

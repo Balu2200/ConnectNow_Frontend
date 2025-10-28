@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// messagesMeta maps chatId (targetUserId) -> { lastMessage, timestamp, unreadCount }
+
 const initialState = {
   lastOpenedChatId: null,
   messagesMeta: {},

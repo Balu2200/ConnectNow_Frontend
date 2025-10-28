@@ -13,7 +13,6 @@ const Body = () => {
   const userData = useSelector((store) => store.user);
 
   useEffect(() => {
-    // Skip profile fetch if on public routes (login/signup/home)
     const publicRoutes = ["/", "/login", "/signup"];
     if (publicRoutes.includes(location.pathname)) {
       return;
@@ -29,19 +28,15 @@ const Body = () => {
       } catch (err) {
         console.error("Profile fetch error:", err);
 
-        // Only redirect to login for authentication errors on protected routes
+  
         if (err?.response?.status === 401) {
-          // Clear any stale user data
           dispatch(removeUser());
           navigate("/login");
         } else if (!err.response) {
-          // Network error - don't redirect, user might be offline temporarily
           console.error("Network error while fetching profile");
         } else if (err.response.status >= 500) {
-          // Server error - don't redirect
           console.error("Server error while fetching profile");
         } else {
-          // Other errors - log but don't redirect
           console.error(
             "Error fetching profile:",
             err.response?.data?.message || err.message
@@ -51,13 +46,10 @@ const Body = () => {
     };
     fetchUser();
   }, [userData, dispatch, navigate, location.pathname]);
-
-  // Check if we're on a public route (navbar still shows on home, just with different state)
   const isPublicRoute = ["/login", "/signup"].includes(location.pathname);
 
   return (
     <div>
-      {/* Only show Navbar on protected routes */}
       {!isPublicRoute && <Navbar />}
       <Outlet />
     </div>

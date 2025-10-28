@@ -14,7 +14,6 @@ function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Handle scroll effect for floating nav
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);

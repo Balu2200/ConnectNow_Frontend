@@ -10,12 +10,11 @@ const Feed = () => {
   const feed = useSelector((store) => store.feed);
   const dispatch = useDispatch();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [viewMode, setViewMode] = useState("grid"); // stack, grid
+  const [viewMode, setViewMode] = useState("grid");
   const [showFilters, setShowFilters] = useState(false);
   const [error, setError] = useState(null);
   const [visibleCount, setVisibleCount] = useState(9);
 
-  // Filter states
   const [filters, setFilters] = useState({
     skills: "",
     location: "",
@@ -25,7 +24,7 @@ const Feed = () => {
 
   useEffect(() => {
     const getFeed = async () => {
-      // Check if feed already has data
+      
       const hasData =
         (feed.Data && feed.Data.length > 0) ||
         (Array.isArray(feed) && feed.length > 0);
@@ -42,7 +41,6 @@ const Feed = () => {
       } catch (err) {
         console.error("Feed API Error:", err);
 
-        // Handle different error scenarios
         if (!err.response) {
           setError(
             "Unable to load feed. Please check your internet connection."
@@ -77,14 +75,10 @@ const Feed = () => {
     }
   };
 
-  // Removed autoplay feature
-
-  // Apply filters to feed data
   useEffect(() => {
     console.log("Feed state:", feed);
     console.log("Feed.Data:", feed.Data);
 
-    // Handle different feed structures
     let feedData = [];
     if (feed.Data && Array.isArray(feed.Data)) {
       feedData = feed.Data;
@@ -101,13 +95,8 @@ const Feed = () => {
     console.log("Initial feed data:", filtered.length, filtered);
     console.log("Current filters:", filters);
 
-    // Filter out users with requestInfo (they'll be shown in the requests page)
     const fresh = filtered.filter((u) => !u.requestInfo);
-
-    // For main view, use only new users
     setFilteredFeed(fresh);
-
-    // Reset current index if it's out of bounds
     if (currentIndex >= fresh.length) {
       setCurrentIndex(0);
     }
@@ -141,7 +130,6 @@ const Feed = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Decorative background */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] rounded-full bg-emerald-200/20 blur-3xl" />

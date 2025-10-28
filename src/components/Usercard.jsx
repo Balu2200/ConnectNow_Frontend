@@ -15,8 +15,7 @@ const Usercard = ({ user, variant = "grid" }) => {
   const [withdrawing, setWithdrawing] = useState(false);
 
   const handleSendRequest = async (status, userId) => {
-    if (reqInfo) return; // prevent sending if a request already exists
-    // Optimistic UI: remove immediately
+    if (reqInfo) return; 
     setResponseStatus(status === "interested" ? "Interested" : "Ignored");
     dispatch(removeFromFeed(userId));
 
@@ -26,13 +25,10 @@ const Usercard = ({ user, variant = "grid" }) => {
         {},
         { withCredentials: true }
       );
-      // Success: mark this user as having an outgoing pending request when coming from a context that doesn't remove them
-      // In our current flow we remove from feed; if that changes, we could uncomment the following line:
-      // dispatch(updateUserRequestInfo({ userId, requestInfo: { exists: true, status: "interested", direction: "outgoing" } }));
+     
     } catch (err) {
       console.error("Error in request:", err);
 
-      // Rollback on failure
       dispatch(addUserToFeed(user));
 
       let errorMessage = "Failed to send request. Please try again.";
@@ -65,8 +61,6 @@ const Usercard = ({ user, variant = "grid" }) => {
       });
       setReqInfo(null);
       setResponseStatus(null);
-      // Reflect in global feed if this card appears elsewhere
-      // dispatch(updateUserRequestInfo({ userId: _id, requestInfo: null }));
       dispatch(addToast("Request withdrawn", "success", 2500));
     } catch (err) {
       console.error("Error withdrawing request:", err);

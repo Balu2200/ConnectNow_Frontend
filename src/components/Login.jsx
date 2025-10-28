@@ -35,14 +35,14 @@ const Login = () => {
     } catch (err) {
       console.error("Login error:", err);
 
-      // Handle different error scenarios
+      
       if (!err.response) {
-        // Network error - no response from server
+       
         setError(
           "Unable to connect to server. Please check your internet connection and try again."
         );
       } else if (err.response.status === 401) {
-        // Invalid credentials
+    
         const message = err.response.data?.message || err.response.data;
         if (
           typeof message === "string" &&
@@ -60,13 +60,13 @@ const Login = () => {
           setError("Invalid email or password. Please try again.");
         }
       } else if (err.response.status === 400) {
-        // Bad request
+       
         setError("Please enter both email and password.");
       } else if (err.response.status >= 500) {
-        // Server error
+        
         setError("Server error. Please try again later.");
       } else {
-        // Other errors
+      
         setError(
           err.response?.data?.message ||
             err.response?.data ||
